@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitPro - Твоят фитнес помощник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .card h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+
+        .workout-timer {
+            text-align: center;
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 800;
+            color: #feca57;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            margin: 20px auto;
+        }
+
+        .progress-ring-circle {
+            stroke: rgba(255,255,255,0.3);
+            fill: transparent;
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.3s ease;
+        }
+
+        .progress-ring-circle.active {
+            stroke: #feca57;
+            stroke-dasharray: 314 314;
+            animation: progress 1s ease-in-out;
+        }
+
+        .workout-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 4px solid #feca57;
+            animation: fadeInLeft 0.5s ease-out;
+        }
+
+        .log-entry h4 {
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .log-entry p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #feca57;
+            display: block;
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .workout-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .workout-item {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #ff6b6b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .workout-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(10px);
+        }
+
+        .workout-item h4 {
+            color: white;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .workout-item p {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+        }
+
+        .floating-action {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .floating-action:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes progress {
+            from { stroke-dasharray: 0 314; }
+            to { stroke-dasharray: 314 314; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 15px 40px rgba(255,107,107,0.4); }
+            100% { box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .timer-display {
+                font-size: 3rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏋️ FitPro</h1>
+            <p>Твоят персонален фитнес асистент</p>
+        </div>
+
+        <div class="dashboard">
+            <!-- Workout Timer Card -->
+            <div class="card">
+                <h3><span class="icon">⏱️</span>Тренировъчен таймер</h3>
+                <div class="workout-timer">
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring-circle" cx="60" cy="60" r="50"></circle>
+                    </svg>
+                    <div class="timer-display" id="timerDisplay">00:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-primary" onclick="startTimer()">Старт</button>
+                        <button class="btn btn-secondary" onclick="pauseTimer()">Пауза</button>
+                        <button class="btn btn-secondary" onclick="resetTimer()">Рестарт</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card">
+                <h3><span class="icon">📊</span>Твоите статистики</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalWorkouts">12</span>
+                        <span class="stat-label">Тренировки</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalTime">8.5</span>
+                        <span class="stat-label">Часа</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="currentStreak">5</span>
+                        <span class="stat-label">Дни поред</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="caloriesBurned">2450</span>
+                        <span class="stat-label">Калории</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Workout Card -->
+            <div class="card">
+                <h3><span class="icon">➕</span>Добави тренировка</h3>
+                <div class="input-group">
+                    <label for="workoutName">Име на тренировката</label>
+                    <input type="text" id="workoutName" placeholder="например: Гърди и бицепси">
+                </div>
+                <div class="input-group">
+                    <label for="workoutType">Тип тренировка</label>
+                    <select id="workoutType">
+                        <option value="strength">Силова</option>
+                        <option value="cardio">Кардио</option>
+                        <option value="flexibility">Гъвкавост</option>
+                        <option value="hiit">HIIT</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="duration">Продължителност (минути)</label>
+                    <input type="number" id="duration" placeholder="45">
+                </div>
+                <button class="btn btn-primary" onclick="addWorkout()" style="width: 100%;">
+                    Добави тренировка
+                </button>
+            </div>
+
+            <!-- Workout Log Card -->
+            <div class="card">
+                <h3><span class="icon">📝</span>История на тренировките</h3>
+                <div class="workout-log" id="workoutLog">
+                    <div class="log-entry">
+                        <h4>Гърди и рамене</h4>
+                        <p>Силова тренировка • 45 мин • Днес</p>
+                    </div>
+                    <div class="log-entry">
+                        <h4>Кардио тренировка</h4>
+                        <p>Кардио • 30 мин • Вчера</p>
+                    </div>
+                    <div class="log-entry">
+                        <h4>Йога за начинаещи</h4>
+                        <p>Гъвкавост • 25 мин • 2 дни назад</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workout Plans Card -->
+            <div class="card">
+                <h3><span class="icon">💪</span>Планове за тренировки</h3>
+                <div class="workout-list">
+                    <div class="workout-item" onclick="selectWorkout('beginner')">
+                        <h4>За начинаещи</h4>
+                        <p>3 тренировки седмично • Цяло тяло • 30-45 мин</p>
+                    </div>
+                    <div class="workout-item" onclick="selectWorkout('intermediate')">
+                        <h4>Средно ниво</h4>
+                        <p>4 тренировки седмично • Push/Pull/Legs • 45-60 мин</p>
+                    </div>
+                    <div class="workout-item" onclick="selectWorkout('advanced')">
+                        <h4>Напреднали</h4>
+                        <p>5-6 тренировки седмично • Специализирани • 60+ мин</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BMI Calculator Card -->
+            <div class="card">
+                <h3><span class="icon">⚖️</span>BMI Калкулатор</h3>
+                <div class="input-group">
+                    <label for="height">Височина (см)</label>
+                    <input type="number" id="height" placeholder="175">
+                </div>
+                <div class="input-group">
+                    <label for="weight">Тегло (кг)</label>
+                    <input type="number" id="weight" placeholder="70">
+                </div>
+                <button class="btn btn-primary" onclick="calculateBMI()" style="width: 100%; margin-bottom: 15px;">
+                    Изчисли BMI
+                </button>
+                <div id="bmiResult" style="text-align: center; color: white; font-size: 1.2rem;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-action" onclick="motivate()">
+        🔥
+    </div>
+
+    <script>
+        let timerInterval;
+        let timerSeconds = 0;
+        let timerRunning = false;
+
+        function startTimer() {
+            if (!timerRunning) {
+                timerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    updateTimerDisplay();
+                    updateProgressRing();
+                }, 1000);
+                
+                // Add visual feedback
+                document.querySelector('.progress-ring-circle').classList.add('active');
+            }
+        }
+
+        function pauseTimer() {
+            if (timerRunning) {
+                timerRunning = false;
+                clearInterval(timerInterval);
+                document.querySelector('.progress-ring-circle').classList.remove('active');
+            }
+        }
+
+        function resetTimer() {
+            timerRunning = false;
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            updateTimerDisplay();
+            document.querySelector('.progress-ring-circle').classList.remove('active');
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgressRing() {
+            const circle = document.querySelector('.progress-ring-circle');
+            const progress = (timerSeconds % 60) / 60;
+            const dashArray = 314 * progress;
+            circle.style.strokeDasharray = `${dashArray} 314`;
+        }
+
+        function addWorkout() {
+            const name = document.getElementById('workoutName').value;
+            const type = document.getElementById('workoutType').value;
+            const duration = document.getElementById('duration').value;
+
+            if (name && duration) {
+                const workoutLog = document.getElementById('workoutLog');
+                const newEntry = document.createElement('div');
+                newEntry.className = 'log-entry';
+                newEntry.innerHTML = `
+                    <h4>${name}</h4>
+                    <p>${getWorkoutTypeLabel(type)} • ${duration} мин • Току що</p>
+                `;
+                workoutLog.insertBefore(newEntry, workoutLog.firstChild);
+
+                // Clear form
+                document.getElementById('workoutName').value = '';
+                document.getElementById('duration').value = '';
+
+                // Update stats
+                updateStats();
+                
+                // Success animation
+                newEntry.style.background = 'rgba(76, 175, 80, 0.3)';
+                setTimeout(() => {
+                    newEntry.style.background = 'rgba(255,255,255,0.1)';
+                }, 2000);
+            }
+        }
+
+        function getWorkoutTypeLabel(type) {
+            const labels = {
+                'strength': 'Силова тренировка',
+                'cardio': 'Кардио',
+                'flexibility': 'Гъвкавост',
+                'hiit': 'HIIT'
+            };
+            return labels[type] || 'Тренировка';
+        }
+
+        function updateStats() {
+            const totalWorkouts = parseInt(document.getElementById('totalWorkouts').textContent) + 1;
+            document.getElementById('totalWorkouts').textContent = totalWorkouts;
+            
+            // Animate number change
+            const element = document.getElementById('totalWorkouts');
+            element.style.transform = 'scale(1.2)';
+            element.style.color = '#4CAF50';
+            setTimeout(() => {
+                element.style.transform = 'scale(1)';
+                element.style.color = '#feca57';
+            }, 500);
+        }
+
+        function calculateBMI() {
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+
+            if (height && weight) {
+                const heightInMeters = height / 100;
+                const bmi = weight / (heightInMeters * heightInMeters);
+                const bmiRounded = bmi.toFixed(1);
+
+                let category, color;
+                if (bmi < 18.5) {
+                    category = 'Поднормено тегло';
+                    color = '#74b9ff';
+                } else if (bmi < 25) {
+                    category = 'Нормално тегло';
+                    color = '#00b894';
+                } else if (bmi < 30) {
+                    category = 'Наднормено тегло';
+                    color = '#fdcb6e';
+                } else {
+                    category = 'Затлъстяване';
+                    color = '#e17055';
+                }
+
+                document.getElementById('bmiResult').innerHTML = `
+                    <div style="font-size: 2rem; font-weight: bold; color: ${color};">${bmiRounded}</div>
+                    <div style="margin-top: 5px;">${category}</div>
+                `;
+            }
+        }
+
+        function selectWorkout(level) {
+            const messages = {
+                'beginner': 'Страхотен избор за начало! 💪',
+                'intermediate': 'Време е да се предизвикаш! 🔥',
+                'advanced': 'Готов си за най-доброто! 🏆'
+            };
+            
+            alert(messages[level]);
+        }
+
+        function motivate() {
+            const motivationalQuotes = [
+                '💪 Ти можеш всичко!',
+                '🔥 Сега е моментът!',
+                '🏆 Успехът те чака!',
+                '⚡ Енергията е в теб!',
+                '🎯 Фокус и постоянство!',
+                '🌟 Ти си звезда!',
+                '💯 Дай всичко от себе си!'
+            ];
+            
+            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            
+            // Create floating message
+            const message = document.createElement('div');
+            message.textContent = randomQuote;
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(45deg, #ff6b6b, #feca57);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 50px;
+                font-size: 1.5rem;
+                font-weight: bold;
+                z-index: 1000;
+                animation: motivatePopup 2s ease-out forwards;
+            `;
+            
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                document.body.removeChild(message);
+            }, 2000);
+        }
+
+        // Add CSS animation for motivation popup
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes motivatePopup {
+                0% { 
+                    opacity: 0; 
+                    transform: translate(-50%, -50%) scale(0.5); 
+                }
+                50% { 
+                    opacity: 1; 
+                    transform: translate(-50%, -50%) scale(1.1); 
+                }
+                100% { 
+                    opacity: 0; 
+                    transform: translate(-50%, -50%) scale(1); 
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Auto-update stats periodically
+        setInterval(() => {
+            const calories = document.getElementById('caloriesBurned');
+            const currentCalories = parseInt(calories.textContent);
+            if (timerRunning && timerSeconds % 60 === 0) {
+                calories.textContent = currentCalories + Math.floor(Math.random() * 10) + 5;
+            }
+        }, 60000);
+    </script>
+</body>
+</html>
